@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+
+    <title>Trắc nghiệm Online</title>
+    <link rel="icon" href="images/stu.png" type="image/x-icon">
+    <link rel="stylesheet" href="css/styles.css">
+
+
+    <!-- <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.11.2/css/all.css"> -->
+    <!-- icon -->
+    <script src="lb/jquery.min.js"></script>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <script src="lb/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="css/mdb.min.css">
+    <script src="lb/angular.min.js"></script>
+    <link rel="stylesheet" href="css/sweetalert2.min.css">
+    <!-- Gọi trình cắm SWAL (SWeet ALert ) -->
+    <script src="lb/sweetalert2.min.js"></script>
+    <!-- Gọi trình cắm SWAL (SWeet ALert ) -->
+    <script src="lb/angular-route.js"></script>
+    <!-- Animetion hiệu ứng chuyển động các slide -->
+    <script src="lb/angular-animate.js"></script>
+    <script src="lb/socket.io.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsencrypt/3.0.0-beta.1/jsencrypt.min.js"></script>
+
+    <!-- <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script> -->
+
+    <link rel="stylesheet" href="css/home.css">
+
+
+
+    <!-- Kết nối trước để tối ưu tốc độ tải -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <!-- Preload Google Fonts -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+        as="style" onload="this.onload=null;this.rel='stylesheet'">
+
+    <!-- Fallback khi preload không chạy -->
+    <noscript>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    </noscript>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+
+</head>
+
+<body class="fixed-sn white-skin" ng-app="myApp">
+
+    <div class="toast-container" aria-live="polite" aria-atomic="true">
+        <div class="toast toast-{{toast.type}}" ng-repeat="toast in toasts track by $index"
+            ng-class="{'show': toast.state === 'show', 'hide': toast.state === 'hide'}">
+            <div class="toast-content">
+                <!-- nếu FontAwesome 6 không nhận 'fas', đổi sang 'fa-solid' -->
+                <i class="fas fa-{{toast.icon}}"></i>
+                <span>{{toast.message}}</span>
+            </div>
+        </div>
+    </div>
+
+
+    <aside class="sidebar" ng-controller="MainCtrl">
+        <div class="logo-section">
+            <div class="logo">
+                <span class="logo-text">STU</span>
+            </div>
+            <h2 class="system-title">Hệ Thống Thi Trắc Nghiệm</h2>
+        </div>
+
+        <nav class="nav-menu">
+            <a href="#!index" class="nav-item" ng-class="{active: isActive('/index')}">
+                <i class="fas fa-home"></i>
+                <span>Trang chủ</span>
+            </a>
+            <a href="#!connections" class="nav-item" ng-class="{active: isActive('/connections')}">
+                <i class="fas fa-network-wired"></i>
+                <span>Kết nối</span>
+            </a>
+            <a href="#!management" class="nav-item" ng-class="{active: isActive('/management')}">
+                <i class="fas fa-cogs"></i>
+                <span>Quản lý</span>
+            </a>
+            <a href="#!quiz" class="nav-item" ng-class="{active: isActive('/quiz')}">
+                <i class="fas fa-question-circle"></i>
+                <span>Làm bài</span>
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <button class="menu-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1 class="page-title">THI TRẮC NGHIỆM</h1>
+            </div>
+            <div class="header-right">
+                <button class="notification-btn" id="notification-btn">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge" id="notification-badge">3</span>
+                </button>
+
+                <!-- Notification Dropdown -->
+                <div class="notification-dropdown" id="notification-dropdown">
+                    <div class="notification-header">
+                        <div class="notification-title">
+                            <i class="fas fa-bell"></i>
+                            <span>Thông báo</span>
+                            <span class="unread-count" id="unread-count">3</span>
+                        </div>
+                        <div class="notification-actions">
+                            <button class="btn-mark-all-read" id="mark-all-read" title="Đánh dấu tất cả đã đọc">
+                                <i class="fas fa-check-double"></i>
+                            </button>
+                            <button class="btn-close" id="close-notifications">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="notification-list" id="notification-list">
+                        <!-- Notifications will be populated here -->
+                    </div>
+
+                    <div class="notification-footer">
+                        <button class="btn-view-all">Xem tất cả thông báo</button>
+                    </div>
+                </div>
+
+                <div class="user-profile" id="user-profile">
+                    <img src="https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=50&h=50&fit=crop&crop=face"
+                        alt="User" class="user-avatar">
+                    <span class="user-name">Admin</span>
+                </div>
+            </div>
+        </header>
+
+
+
+
+
+        <div class="slide-container">
+            <div ng-view class="slide-animation"></div>
+        </div>
+
+    </main>
+
+
+
+    <!-- Dialog xem chi tiết câu hỏi -->
+    <div class="dialog-overlay" id="view-question-dialog">
+        <div class="dialog">
+            <div class="dialog-header">
+                <h3>Chi tiết câu hỏi</h3>
+                <button class="dialog-close" onclick="closeDialog('view-question-dialog')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="dialog-content">
+                <div class="question-detail">
+                    <div class="question-text" id="view-question-text">
+                        <!-- Question content will be loaded here -->
+                    </div>
+                    <div class="question-answers" id="view-question-answers">
+                        <!-- Answers will be loaded here -->
+                    </div>
+                    <div class="question-info">
+                        <div class="info-item">
+                            <strong>Độ khó:</strong> <span id="view-question-difficulty"></span>
+                        </div>
+                        <div class="info-item">
+                            <strong>Người tạo:</strong> <span id="view-question-author"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Profile Modal -->
+    <div class="modal-overlay" id="profile-modal">
+        <div class="modal-content profile-modal">
+            <div class="modal-header">
+                <h2>Thông tin tài khoản</h2>
+                <button class="btn-close" onclick="closeProfileModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <div class="profile-section">
+                    <div class="avatar-section">
+                        <div class="avatar-container">
+                            <img src="https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop&crop=face"
+                                alt="Avatar" class="profile-avatar" id="profile-avatar">
+                            <input type="file" id="avatar-upload" accept="image/*" style="display: none;">
+                            <label for="avatar-upload" class="avatar-upload-btn" id="avatar-upload-btn"
+                                style="display: none;">
+                                <i class="fas fa-camera"></i>
+                            </label>
+                        </div>
+                        <div class="profile-basic">
+                            <h3 id="profile-display-name">Nguyễn Văn Admin</h3>
+                            <p id="profile-display-position">Giảng viên</p>
+                            <span class="status-online">Đang hoạt động</span>
+                        </div>
+                    </div>
+
+                    <div class="profile-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>
+                                    <i class="fas fa-user"></i>
+                                    Họ và tên
+                                </label>
+                                <span class="form-value" id="name-display">Nguyễn Văn Admin</span>
+                                <input type="text" value="Nguyễn Văn Admin" class="form-input" id="name-input"
+                                    style="display: none;">
+                            </div>
+
+                            <div class="form-group">
+                                <label>
+                                    <i class="fas fa-envelope"></i>
+                                    Email
+                                </label>
+                                <span class="form-value" id="email-display">admin@stu.edu.vn</span>
+                                <input type="email" value="admin@stu.edu.vn" class="form-input" id="email-input"
+                                    style="display: none;">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>
+                                    <i class="fas fa-phone"></i>
+                                    Số điện thoại
+                                </label>
+                                <span class="form-value" id="phone-display">0123456789</span>
+                                <input type="tel" value="0123456789" class="form-input" id="phone-input"
+                                    style="display: none;">
+                            </div>
+
+                            <div class="form-group">
+                                <label>
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    Địa chỉ
+                                </label>
+                                <span class="form-value" id="address-display">TP. Hồ Chí Minh</span>
+                                <input type="text" value="TP. Hồ Chí Minh" class="form-input" id="address-input"
+                                    style="display: none;">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Khoa/Phòng ban</label>
+                                <span class="form-value" id="department-display">Khoa Công nghệ Thông tin</span>
+                                <input type="text" value="Khoa Công nghệ Thông tin" class="form-input"
+                                    id="department-input" style="display: none;">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Chức vụ</label>
+                                <span class="form-value" id="position-display">Giảng viên</span>
+                                <input type="text" value="Giảng viên" class="form-input" id="position-input"
+                                    style="display: none;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-primary" id="edit-profile-btn" onclick="toggleEditMode()">Chỉnh sửa</button>
+                <button class="btn btn-outline" id="cancel-edit-btn" onclick="cancelEdit()"
+                    style="display: none;">Hủy</button>
+                <button class="btn btn-primary" id="save-profile-btn" onclick="saveProfile()" style="display: none;">
+                    <i class="fas fa-save"></i>
+                    Lưu thay đổi
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- SCRIPTS -->
+    <!-- <script src="lb/jquery.min.js"></script> -->
+    <script type="text/javascript" src="lb/mdb.min.js"></script>
+    <script src="https://smtpjs.com/v3/smtp.js"></script>
+    <!-- <script src="js/home.js"></script> -->
+
+    <script src="app/myapp.js"></script>
+    <script src="app/ApiService.js"></script>
+    <!-- <script src="APP/indexCtrl.js"></script> -->
+    <script src="app/MainCtrl.js"></script>
+    <script src="app/HomeViewCtrl.js"></script>
+    <script src="app/ConnectionsCtrl.js"></script>
+    <script src="app/ManagementCtrl.js"></script>
+    <script src="app/QuizViewCtrl.js"></script>
+    <script src="app/loginCtrl.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- <script src="html/ConnectionsView.html"></script> -->
+
+
+</body>
+
+</html>

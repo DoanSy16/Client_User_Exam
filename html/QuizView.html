@@ -1,0 +1,200 @@
+<div class="exam-container">
+    <div class="main-content">
+        <div class="content-wrapper">
+            <!-- Question Section -->
+            <div class="question-section">
+                <!-- Exam Header -->
+                <div class="exam-header">
+                    <div class="header-top">
+                        <div class="header-left">
+                            <div class="stu-logo">
+                                <div class="logo-text">STU</div>
+                            </div>
+                            <div class="exam-title">
+                                <h1>BÀI THI: {{ examData.discipline_name }}</h1>
+                                <div class="exam-info">
+                                    Thời gian làm bài: <span>{{ examData.time }} phút</span>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="header-right">
+                            <div class="timer-container" ng-class="getTimerClass()">
+                                <div class="timer">{{ formatTime(timeRemaining) }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="my-0 md-progress header-bottom">
+                        <div class="progress-bar {{(timeRemaining <= 120)?'red':'blue'}}" role="progressbar"
+                            style="width: {{timeRemaining / (examData.time* 60) * 100}}%"></div>
+                    </div>
+                </div>
+
+                <!-- Question Content -->
+                <div class="question-container">
+                    <div class="question-header">
+                        <div class="question-number">
+                            Câu {{ currentQuestion }}/{{ examData.countQuestions }}
+                        </div>
+                        <div class="question-actions">
+                            <button class="submit-btn" ng-click="showSubmitModal()" ng-disabled="!examData.statusExam">
+                                Nộp bài
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="question-content" ng-if="getCurrentQuestion()">
+                        <div class="question-text">{{ getCurrentQuestion().text_question }}</div>
+
+                        <div class="answers-container"
+                            ng-class="{'with-images': getCurrentQuestion().source_image && getCurrentQuestion().source_image.length > 0}">
+
+                            <div class="answers-section">
+                                <!-- Radio buttons for single choice -->
+                                <div ng-if="getCurrentQuestion().type_question_id === 1" class="answer-options">
+                                    <div ng-repeat="answer in getCurrentQuestion().Answers_Text track by answer.answer_option_id"
+                                        class="answer-option">
+                                        <input type="radio" id="answer-{{ answer.answer_option_id }}"
+                                            name="question-{{ getCurrentQuestion().question_id }}"
+                                            ng-value="answer.answer_option_id" ng-model="answers[currentQuestion]"
+                                            ng-change="updateAnsweredCount()" ng-disabled="!examData.statusExam">
+                                        <label for="answer-{{ answer.answer_option_id }}">
+                                            <span class="option-letter">{{ getOptionLetter($index) }}</span>
+                                            <span class="option-text">{{ answer.text_answer }}</span>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Checkboxes for multiple choice -->
+                                <div ng-if="getCurrentQuestion().type_question_id === 2" class="answer-options">
+                                    <div ng-repeat="answer in getCurrentQuestion().Answers_Text track by answer.answer_option_id"
+                                        class="answer-option">
+                                        <input type="checkbox" id="answer-{{ answer.answer_option_id }}"
+                                            ng-value="answer.answer_option_id"
+                                            ng-checked="isCheckboxSelected(answer.answer_option_id)"
+                                            ng-click="toggleCheckbox(answer.answer_option_id)"
+                                            ng-disabled="!examData.statusExam">
+                                        <label for="answer-{{ answer.answer_option_id }}">
+                                            <span class="option-letter">{{ getOptionLetter($index) }}</span>
+                                            <span class="option-text">{{ answer.text_answer }}</span>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Text input for essay questions -->
+                                <div ng-if="getCurrentQuestion().type_question_id === 3">
+                                    <textarea class="text-input" ng-model="answers[currentQuestion]"
+                                        ng-change="updateAnsweredCount()" placeholder="Nhập câu trả lời của bạn..."
+                                        ng-disabled="!examData.statusExam"></textarea>
+                                </div>
+                            </div>
+
+                            <!-- Images section -->
+                            <div ng-if="getCurrentQuestion().source_image && getCurrentQuestion().source_image.length > 0"
+                                ng-repeat="image in getCurrentQuestion().source_image" class="images-section">
+                                <img ng-src="{{ image.source_image }}" alt="Hình ảnh câu hỏi" class="question-image">
+                                <p>{{image.content}}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <!-- Student Info -->
+                <div class="student-info">
+                    <div class="info-card">
+                        <div class="student-details">
+                            <div class="info-group">
+                                <span class="info-label">Họ tên:</span>
+                                <span class="info-value">{{ examData.nameSelected }}</span>
+                            </div>
+                            <div class="info-group">
+                                <span class="info-label">MSSV:</span>
+                                <span class="info-value">{{ examData.isSelected }}</span>
+                            </div>
+                            <div class="info-group">
+                                <span class="info-label">Lớp:</span>
+                                <span class="info-value">{{ examData.classNameSelected }}</span>
+                            </div>
+                            <div class="info-group progress-info">
+                                <span class="info-label">Tiến độ</span>
+                                <div class="progress-container">
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" ng-style="{'width': getProgressPercentage() + '%'}">
+                                        </div>
+                                    </div>
+                                    <span class="info-value">{{ getAnsweredCount() }}/{{ examData.countQuestions
+                                        }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Question Navigation -->
+                <div class="question-sidebar">
+                    <h3>Danh sách câu hỏi</h3>
+                    <div class="question-grid">
+                        <button ng-repeat="questionNum in questionNumbers track by $index" class="question-btn"
+                            ng-class="getQuestionButtonClass(questionNum)" ng-click="goToQuestion(questionNum)"
+                            ng-disabled="!examData.statusExam">
+                            {{ questionNum }}
+                        </button>
+                    </div>
+                    <div class="legend">
+                        <div class="legend-item">
+                            <span class="legend-color current"></span>
+                            <span>Đang làm</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color answered"></span>
+                            <span>Đã làm</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color unanswered"></span>
+                            <span>Chưa làm</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tab Change Warning Modal -->
+<div class="modal" ng-show="showWarningModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>⚠️ Cảnh báo</h3>
+        </div>
+        <div class="modal-body">
+            <p>Bạn đã chuyển sang tab khác. Điều này có thể bị coi là gian lận trong bài thi.</p>
+            <p>Số lần chuyển tab: <span>{{ tabSwitchCount }}</span></p>
+        </div>
+        <div class="modal-footer">
+            <button class="modal-btn error" ng-click="requestReconnect()">
+                Yêu cầu kết nối
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Submit Confirmation Modal -->
+<div class="modal" ng-show="showSubmitConfirmModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>📝 Xác nhận nộp bài</h3>
+        </div>
+        <div class="modal-body">
+            <p>Bạn đã trả lời {{ getAnsweredCount() }}/{{ examData.countQuestions }} câu hỏi.</p>
+            <p><strong>Bạn có chắc chắn muốn nộp bài không?</strong></p>
+            <p class="warning-text">Sau khi nộp bài, bạn sẽ không thể chỉnh sửa câu trả lời.</p>
+        </div>
+        <div class="modal-footer">
+            <button class="modal-btn secondary" ng-click="closeSubmitModal()">Hủy</button>
+            <button class="modal-btn primary" ng-click="confirmSubmit()">Nộp bài</button>
+        </div>
+    </div>
+</div>

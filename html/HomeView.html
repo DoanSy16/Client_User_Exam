@@ -1,0 +1,346 @@
+<style>
+    .collapsible input:checked+label {
+        background: linear-gradient(-45deg, #ee7752, #FF66FF, #23a6d5, #23d5ab);
+        background-size: 400% 400%;
+        animation: gradient 15s ease infinite;
+    }
+
+    @keyframes gradient {
+        0% {
+            background-position: 0% 50%;
+        }
+
+        50% {
+            background-position: 100% 50%;
+        }
+
+        100% {
+            background-position: 0% 50%;
+        }
+    }
+
+    .wrapper {
+        display: flex;
+        padding-top: 0px;
+        justify-content: center;
+    }
+
+    .collapsible {
+        max-width: 450px;
+        overflow: hidden;
+        font-weight: 500;
+    }
+
+    .collapsible input {
+        display: none;
+    }
+
+    .collapsible label {
+        position: relative;
+        font-weight: 600;
+        background: #ffff;
+        box-shadow: 0 5px 0 rgba(0, 0, 0, .1), 0 4px 11px rgba(0, 0, 0, .08);
+        display: block;
+        margin-bottom: 10px;
+        cursor: pointer;
+        padding: 15px;
+        border-radius: 4px;
+        z-index: 0;
+    }
+
+    .collapsible label:after {
+        content: "";
+        position: absolute;
+        right: 15px;
+        top: 20px;
+        width: 18px;
+        height: 18px;
+        background: url(arrow.svg) no-repeat(0 0);
+        transition: all 0.3s ease;
+    }
+
+    .collapsible input:checked+label:after {
+        transform: rotate(90deg);
+    }
+
+    .collapsible-text {
+        /* margin-bottom: 10px; */
+        max-height: 1px;
+        overflow: hidden;
+        border-radius: 4px;
+        line-height: 1.4;
+        position: relative;
+        top: -100%;
+        opacity: 0.5;
+        transition: all 0.5s ease;
+    }
+
+    .collapsible input:checked~.collapsible-text {
+        max-height: 300px;
+        padding-bottom: 25px;
+        background: #ffff;
+        box-shadow: 0 5px 0 rgba(0, 0, 0, .1), 0 4px 11px rgba(0, 0, 0, .08);
+        opacity: 1;
+        top: 0;
+    }
+
+    .collapsible-text p {
+        padding-left: 15px;
+        padding-right: 15px;
+        font-weight: normal;
+        font-size: 15px;
+    }
+
+    section {
+        padding: 10px;
+    }
+</style>
+<section> <!-- Home View -->
+    <div class="view active" id="home-view">
+        <div class="content-grid">
+            <div class="exam-config-card">
+                <div class="card-header">
+                    <h3>Cấu hình bài thi</h3>
+                    <p>Thiết lập các thông số cho kỳ thi</p>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Thời gian (phút)</label>
+                        <div class="input-with-controls">
+                            <input type="number" min="1" id="time-input" ng-model="time" ng-change="onTimeChange()">
+                            <div class="input-controls">
+                                <button class="control-btn" ng-click="adjustValue('time-input', 1)">+</button>
+                                <button class="control-btn" ng-click="adjustValue('time-input', -1)">-</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Số câu hỏi</label>
+                        <div class="input-with-controls">
+                            <input type="number" min="0" ng-model="countExamQuestions" id="question-count-input"
+                                ng-change="onCountQuestionsChange()">
+                            <div class="input-controls">
+                                <button class="control-btn" ng-click="adjustValue('question-count-input', 1)">+</button>
+                                <button class="control-btn"
+                                    ng-click="adjustValue('question-count-input', -1)">-</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Số máy</label>
+                        <input type="number" min="1" id="machines-input" ng-model="machines"
+                            ng-change="onMachinesChange()">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Môn thi</label>
+                        <!-- <select class="select-input" id="subject-select" ng-model="item_Disciplines">
+                           <option  ng-repeat="d in h_Disciplines" value="{{d.discipline_id}}" >
+                                {{d.name_discipline}}
+                            </option>
+                        </select> -->
+
+                        <select class="select-input" id="subject-select" ng-model="selectedDiscipline"
+                            ng-change="logDiscipline(selectedDiscipline)"
+                            ng-options="d.discipline_id as d.name_discipline for d in h_Disciplines">
+                        </select>
+
+                    </div>
+
+                    <div class="form-group">
+                        <label>Độ khó</label>
+                        <select class="select-input" id="difficulty-select" ng-model="selectedLevel"
+                            ng-change="logLevel(selectedLevel)"
+                            ng-options="l.level_id as l.name_level for l in h_level_questions">
+                        </select>
+
+                    </div>
+
+                    <div class="form-group">
+                        <label>Phòng thi</label>
+                        <!-- <select class="select-input" id="room-select" ng-model="selectedRoom"
+                            ng-change="logRoom(selectedRoom)" ng-options="r for r in room">
+                        </select> -->
+                        <div style="display: flex; flex-direction: row; gap: 8px;">
+                            <input type="text" id="test-count-input" ng-model="code_room" readonly>
+                            <button ng-class="{'hide': code_room, 'show': !code_room}" class="btn "
+                                style="background-color: green; color: white;" ng-click="exam.createCodeRoom()">Tạo
+                                phòng</button>
+                            <button ng-if="code_room" class="btn btn-primary" ng-click="exam.copyCodeRoom()">Sao
+                                chép</button>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-primary" ng-click="fShowSelectQuestionsDialog()">Chọn câu
+                        hỏi</button>
+                    <button class="btn btn-secondary" ng-click="exam.createExamQuestions()" style="color: white;">Tạo
+                        đề</button>
+                    <button class="btn"  style="background-color: green; color: white;">Bắt đầu</button>
+                    <button class="btn btn-danger" ng-click="exam.deleteAllExamQuestions()">Xóa đề</button>
+                </div>
+            </div>
+
+            <div class="questions-list-card">
+                <div class="card-header">
+                    <h3>Danh sách câu hỏi</h3>
+                    <div class="header-actions">
+                        <span class="question-count">Đã chọn: <span id="selected-count">{{confirmSelectedQuestions
+                                .length}}</span> câu</span>
+                    </div>
+                </div>
+
+               
+
+
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>STT</th>
+                                <th>ID Máy</th>
+                                <th>Số câu</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="questions-table">
+                            <tr ng-repeat="data in data_exam_questions" ng-init="index = $index + 1">
+                                <td>{{index}}</td>
+                                <td>{{data.examId}}</td>
+                                <td>{{data.questions.length}}</td>
+                                <td>
+                                    <button class="btn btn-outline btn-sm" title="Xem chi tiết"
+                                        ng-click="fShowViewQuestionsDialog(data.questions)">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="btn btn-danger btn-sm" title="Xóa"
+                                        ng-click="exam.deleteExamQuestion(data.examId)">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dialog xem chi tiết câu hỏi -->
+    <div class="dialog-overlay" id="view-question-dialog" ng-class="{active: showViewQuestionsDialog}">
+        <div class="dialog">
+            <div class="dialog-header">
+                <h3>Chi tiết câu hỏi</h3>
+                <button class="dialog-close" ng-click="closeViewQuestionsDialog()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="dialog-content">
+                <div class="question-detail" ng-repeat="q in showViewAllQuestions" ng-init="index = $index + 1">
+                    <div class="question-text" id="view-question-text">
+                        {{index}} - {{q.text_question}}
+                    </div>
+                    <div class="question-answers" id="view-question-answers" ng-repeat="a in q.Answers_Text">
+                        <div class="answer-item">
+                            <span class="answer-label"> {{answerArr(a.answer_option_id)}}</span>
+                            <span class="answer-text">{{a.text_answer}}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dialog chọn câu hỏi -->
+    <div class="dialog-overlay" id="select-questions-dialog" ng-class="{active: showSelectQuestionsDialog}">
+        <div class="dialog">
+            <div class="dialog-header">
+                <h3>Chọn câu hỏi cho kỳ thi</h3>
+                <button class="dialog-close" ng-click="closeDialog()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="dialog-content">
+                <div class="dialog-filter">
+                    <input type="text" placeholder="Tìm kiếm câu hỏi..." class="search-input" id="dialog-search"
+                        ng-change="search()" ng-model="change_search">
+                    <select class="filter-select" id="dialog-difficulty-filter" ng-model="selectedLevelDialog"
+                        ng-options="l.level_id as l.name_level for l in h_level_questions"
+                        ng-change="log_dialog_difficulty_filter(selectedLevelDialog)">
+                        <option value="">Tất cả độ khó</option>
+                    </select>
+                </div>
+                <!-- <div class="dialog-questions-list" id="dialog-questions-list" ng-repeat="q in generateSampleData">
+                    Questions will be populated here
+                     
+                </div> -->
+                <div class="dialog-questions-list" id="dialog-questions-list">
+                    <!-- Questions will be populated here -->
+
+                    <div class="dialog-stats" ng-if="!questions || questions.length === 0">
+                        KÔNG CÓ CÂU HỎI PHÙ HỢP
+                    </div>
+                    <div ng-repeat="q in questions" ng-init="index = $index + 1">
+                        <div class="dialog-question-item">
+                            <div class="question-checkbox">
+                                <input type="checkbox" id="q-{{q.question_id}}"
+                                    ng-checked="selectedQuestions.indexOf(q.question_id) !== -1"
+                                    ng-change="exam.toggleQuestionSelection(q.question_id)" ng-model="q.selected">
+                                <label for="q-{{q.question_id}}"></label>
+                            </div>
+
+                            <div class="question-preview">
+                                <div class="wrapper">
+                                    <div class="collapsible" style="min-width: 100% !important;">
+                                        <input type="checkbox" id="collapsible-head-{{index}}">
+                                        <label for="collapsible-head-{{index}}" style="margin-right: 0px;">
+                                            <h5 class="black-text font-weight-normal mb-0">
+                                                {{index}}: {{q.text_question}}<i class="fas fa-angle-down rotate-icon"
+                                                    style="float: right;"></i>
+                                            </h5>
+                                        </label>
+                                        <div class="collapsible-text">
+                                            <div ng-repeat="an in q.Answers_Text">
+                                                <p>
+                                                    {{answerArr(an.answer_option_id)}}. {{an.text_answer}}
+                                                </p>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- <div class="question-text">{{index}}: {{q.text_question}} <i
+                                        class="fas fa-angle-down rotate-icon" style="float: right;"></i></div> -->
+                                <div class="question-meta">
+                                    <span class="difficulty-badge {{ getDifficultyClass(q.name_level) }}">
+                                        {{q.name_level}}
+                                    </span>
+
+                                    <span ng-if="q.count_image > 0" class="image-indicator">
+                                        <i class="fas fa-image"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dialog-stats">
+                    Đã chọn: <span id="dialog-selected-count">{{selectedQuestions.length}}</span> câu hỏi
+                </div>
+            </div>
+            <div class="dialog-footer">
+                <button class="btn" style="background-color: green; color: white;"
+                    ng-click="exam.toggleSelectAll()">Chọn tất cả</button>
+                <button class="btn btn-outline" ng-click="exam.clearSelectedQuestions()">Bỏ chọn tất cả</button>
+                <button class="btn btn-primary" ng-click="exam.confirmQuestions()">Xác nhận</button>
+            </div>
+        </div>
+    </div>
+</section>

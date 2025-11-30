@@ -1,0 +1,101 @@
+<section ng-controller="LoginCtrl as vm">
+
+    <div class="login-container">
+        <div class="login-wrapper">
+            <!-- Header với Logo -->
+            <div class="login-header">
+                <div class="stu-logo">
+                    <div class="logo-text">STU</div>
+                </div>
+                <div class="header-content">
+                    <h1>HỆ THỐNG THI TRẮC NGHIỆM</h1>
+                    <p class="subtitle">TRƯỜNG ĐẠI HỌC CÔNG NGHỆ SÀI GÒN</p>
+                </div>
+            </div>
+
+            <!-- Form đăng nhập -->
+            <div class="login-form-container">
+                <div class="form-header">
+                    <h2>ĐĂNG NHẬP THI</h2>
+                    <p>Vui lòng nhập đầy đủ thông tin để vào phòng thi</p>
+                </div>
+
+                <form class="login-form" name="loginForm" ng-submit="vm.handleLogin()" novalidate>
+                    <div class="form-group"
+                        ng-class="{'error': vm.showError('fullname'), 'success': vm.showSuccess('fullname')}">
+                        <label for="fullname">Họ và tên</label>
+                        <input type="text" id="fullname" name="fullname" ng-model="vm.formData.fullname"
+                            ng-blur="vm.validateField('fullname')" ng-focus="vm.clearError('fullname')"
+                            placeholder="Nhập họ và tên đầy đủ" required>
+                        <div class="input-icon">👤</div>
+                        <div class="error-message" ng-show="vm.errors.fullname">{{vm.errors.fullname}}</div>
+                    </div>
+
+                    <div class="form-group"
+                        ng-class="{'error': vm.showError('studentId'), 'success': vm.showSuccess('studentId')}">
+                        <label for="studentId">Mã số sinh viên</label>
+                        <input type="text" id="studentId" name="studentId" ng-model="vm.formData.studentId"
+                            ng-blur="vm.validateField('studentId')" ng-focus="vm.clearError('studentId')"
+                            ng-change="vm.formatStudentId()" placeholder="Ví dụ: DH50000" required>
+                        <div class="input-icon">🎓</div>
+                        <div class="error-message" ng-show="vm.errors.studentId">{{vm.errors.studentId}}</div>
+                    </div>
+
+                    <div class="form-group"
+                        ng-class="{'error': vm.showError('className'), 'success': vm.showSuccess('className')}">
+                        <label for="className">Lớp</label>
+                        <input type="text" id="className" name="className" ng-model="vm.formData.className"
+                            ng-blur="vm.validateField('className')" ng-focus="vm.clearError('className')"
+                            ng-change="vm.formatClassName()" placeholder="Ví dụ: CNTT01" required>
+                        <div class="input-icon">📚</div>
+                        <div class="error-message" ng-show="vm.errors.className">{{vm.errors.className}}</div>
+                    </div>
+
+                    <div class="form-group"
+                        ng-class="{'error': vm.showError('roomId'), 'success': vm.showSuccess('roomId')}">
+                        <label for="roomId">ID Phòng thi</label>
+                        <input type="text" id="roomId" name="roomId" ng-model="vm.formData.roomId"
+                            ng-blur="vm.validateField('roomId')" ng-focus="vm.clearError('roomId')"
+                            ng-change="vm.formatRoomId()" placeholder="Nhập mã phòng thi" required>
+                        <div class="input-icon">🏫</div>
+                        <div class="error-message" ng-show="vm.errors.roomId">{{vm.errors.roomId}}</div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="login-btn" ng-class="{'loading': vm.isLoading}"
+                            ng-disabled="vm.isLoading" ng-click="vm.handleLogin()">
+                            <span class="btn-text">VÀO PHÒNG THI</span>
+                            <span class="btn-icon">→</span>
+                        </button>
+                    </div>
+
+                    <div class="form-note">
+                        <p><strong>Lưu ý:</strong> Vui lòng kiểm tra kỹ thông tin trước khi đăng nhập. Sau khi vào phòng
+                            thi, bạn sẽ không thể thay đổi thông tin.</p>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Footer -->
+            <div class="login-footer">
+                <p>© 2025 Trường Đại học Công nghệ Sài Gòn</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal thông báo -->
+    <div class="modal" ng-show="vm.modal.show">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 ng-bind="vm.modal.title">Thông báo</h3>
+            </div>
+            <div class="modal-body">
+                <p ng-bind="vm.modal.message">Nội dung thông báo</p>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn primary" ng-click="vm.hideModal()">Đồng ý</button>
+                 <button class="modal-btn error" ng-if="vm.modal.showButton"  ng-click="">Yêu cầu đăng nhập lại!</button>
+            </div>
+        </div>
+    </div>
+</section>
