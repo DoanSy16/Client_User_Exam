@@ -92,6 +92,7 @@ app.controller("LoginCtrl", function ($scope, $timeout, $window, SocketService) 
     }
 
     function handleLogin() {
+
         // Reset errors
         vm.errors = {};
         vm.validFields = {};
@@ -114,10 +115,11 @@ app.controller("LoginCtrl", function ($scope, $timeout, $window, SocketService) 
 
         // Hiển thị loading
         vm.isLoading = true;
-
+           localStorage.clear();
         // Giả lập quá trình đăng nhập
         simulateLogin()
             .then(function () {
+                
                 saveStudentInfo();
                 // Hiển thị thành công và chuyển trang
                 // showModal('✅ Đăng nhập thành công',
@@ -153,6 +155,7 @@ app.controller("LoginCtrl", function ($scope, $timeout, $window, SocketService) 
 
     function saveStudentInfo() {
         try {
+ 
             var studentInfo = {
                 fullname: vm.formData.fullname.trim(),
                 studentId: vm.formData.studentId.trim(),

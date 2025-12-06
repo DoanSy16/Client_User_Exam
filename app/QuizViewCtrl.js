@@ -9,6 +9,7 @@ app.controller("QuizCtrl", function ($scope, $interval, $window, $timeout, ExamS
     const decrypt = CryptoService.decrypt(data_local.questions, data_local.examId);
     data_local.questions = JSON.parse(decrypt)
     $scope.examData = data_local || ExamService.getAll() || [];
+
     let time_encrypt = CryptoService.encrypt(($scope.examData.time * 60), `${$scope.examData.roomId}${$scope.examData.isSelected}`);
     // localStorage.setItem('time', time_encrypt);
     // Initialize exam state
@@ -17,8 +18,30 @@ app.controller("QuizCtrl", function ($scope, $interval, $window, $timeout, ExamS
     // $scope.timeRemaining = $scope.examData.time * 60; // Convert minutes to seconds
     $scope.timeRemaining = localStorage.getItem('time') ? CryptoService.decrypt(localStorage.getItem('time'), `${$scope.examData.roomId}${$scope.examData.isSelected}`) : $scope.examData.time * 60; // Convert minutes to seconds
     $scope.tabSwitchCount = 0;
-    $scope.showWarningModal = false;
+    $scope.showWarningModal = localStorage.getItem('showWarningModal') ? localStorage.getItem('showWarningModal') : false;
     $scope.showSubmitConfirmModal = false;
+
+
+
+
+
+
+    $scope.hoverImageId = null;
+
+    $scope.setHover = function (imageId) {
+        if (imageId && imageId !== "NULL") {
+            $scope.hoverImageId = +imageId;
+        } else {
+            $scope.hoverImageId = null;
+        }
+    };
+
+    $scope.clearHover = function () {
+        $scope.hoverImageId = null;
+    };
+
+
+
 
 
     // Generate question numbers array
@@ -129,9 +152,9 @@ app.controller("QuizCtrl", function ($scope, $interval, $window, $timeout, ExamS
         }
     };
 
-    $scope.closeWarningModal = function () {
-        $scope.showWarningModal = false;
-    };
+    // $scope.closeWarningModal = function () {
+    //     $scope.showWarningModal = false;
+    // };
     $scope.requestReconnect = function () {
         const user = JSON.parse(localStorage.getItem('studentInfo'));
         const data_exam_questions = JSON.parse(localStorage.getItem('data_exam_questions'));
@@ -142,12 +165,9 @@ app.controller("QuizCtrl", function ($scope, $interval, $window, $timeout, ExamS
 
     };
     SocketService.on("user_reconnect_accepted", function (data) {
-        console.log('data: ', data)
-        $scope.showWarningModal = false;
-        // socket.emit("user_join_room_again", {
-        //     roomId: $rootScope.roomId,
-        //     examId: data.examId
-        // });
+        $timeout(function () {
+            $scope.showWarningModal = false;
+        });
     });
 
 
@@ -219,6 +239,7 @@ app.controller("QuizCtrl", function ($scope, $interval, $window, $timeout, ExamS
                 $scope.$apply(function () {
                     $scope.tabSwitchCount++;
                     $scope.showWarningModal = true;
+                    localStorage.setItem('showWarningModal', $scope.showWarningModal);
                 });
             }
         });
@@ -231,6 +252,7 @@ app.controller("QuizCtrl", function ($scope, $interval, $window, $timeout, ExamS
                     $scope.$apply(function () {
                         $scope.tabSwitchCount++;
                         $scope.showWarningModal = true;
+                        localStorage.setItem('showWarningModal', $scope.showWarningModal);
                     });
                     return false;
                 }
@@ -241,6 +263,7 @@ app.controller("QuizCtrl", function ($scope, $interval, $window, $timeout, ExamS
                         $scope.$apply(function () {
                             $scope.tabSwitchCount++;
                             $scope.showWarningModal = true;
+                            localStorage.setItem('showWarningModal', $scope.showWarningModal);
                         });
                     }, 100);
                     return false;
@@ -276,12 +299,16 @@ app.controller("QuizCtrl", function ($scope, $interval, $window, $timeout, ExamS
                 }, 100);
             }
         });
+        // $scope.hoverImageId=function(id){
+        //     console.log('id: '.id)
+        // }
 
         // Show warning when user focuses back
         angular.element($window).on('focus', function () {
             if ($scope.tabSwitchCount > 0 && $scope.examData.statusExam) {
                 $scope.$apply(function () {
                     $scope.showWarningModal = true;
+                    localStorage.setItem('showWarningModal', $scope.showWarningModal);
                 });
             }
         });

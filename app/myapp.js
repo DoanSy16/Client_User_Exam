@@ -12,14 +12,6 @@ app.run(function ($rootScope, $window, $timeout, ExamService, SocketService, Cry
     }
   });
 
-  SocketService.on("user_reconnect_accepted", function (data) {
-    console.log('data: ', data)
-
-    // socket.emit("user_join_room_again", {
-    //     roomId: $rootScope.roomId,
-    //     examId: data.examId
-    // });
-  });
 
 
   $rootScope.$on('$routeChangeSuccess', function () {
@@ -28,7 +20,6 @@ app.run(function ($rootScope, $window, $timeout, ExamService, SocketService, Cry
       $timeout(() => {
         $rootScope.$broadcast("SHOW_USER_MARK", mark);
       }, 0);
-
       localStorage.removeItem("user_mark");
     }
   });
@@ -42,21 +33,39 @@ app.run(function ($rootScope, $window, $timeout, ExamService, SocketService, Cry
     if (localStorage.getItem('data_exam_questions'))
       $window.location.href = '#!quizView';
   });
-  // SocketService.on("server_send_mark_to_client_user", function (data) {
-  //   alert("Điểm: " + data.mark);
-  // });
-  // SocketService.on("server_send_mark_to_client_user", function (data) {
-  //   console.log("Điểm nhận được: ", data.mark);
-  //   localStorage.setItem("user_mark", data.mark);
-  //   $window.location.href = 'index.html';
-  // });
 
 
   SocketService.on("room_cancelled", function ({ message }) {
-    console.log('message: ', message)
     localStorage.clear();
+    $window.location.href = 'index.html';
+  });
+  SocketService.on("server_send_disconnect_client_user", function (data) {
+    localStorage.clear();
+    $window.location.href = 'index.html';
+  });
 
-  })
+
+  (function () {
+    const styleBig = "color:red;font-size:50px;font-weight:bold;";
+    const styleText = "font-size:14px;color:black;";
+
+    console.clear();
+    console.log("%cDừng lại!", styleBig);
+    console.log(
+      "%cĐây là một tính năng của trình duyệt dành cho các nhà phát triển.\n" +
+      "Nếu ai đó bảo bạn sao chép-dán nội dung nào đó vào đây để bật tính năng hoặc hack tài khoản, đó là lừa đảo.\n" +
+      "Việc này có thể khiến họ chiếm tài khoản của bạn.",
+      styleText
+    );
+    // console.log("%cXem thêm: https://example.com/canh-bao", "color:blue;text-decoration:underline;");
+  })();
+  (function () {
+    const original = console.log;
+    console.log = function () {
+      original.apply(console, arguments);
+    };
+  })();
+
 
 });
 

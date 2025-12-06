@@ -344,6 +344,8 @@ textarea {
 
 /* Question Content */
 .question-container {
+  width: 1000px;
+  min-width: 100%;
   background: white;
   border-radius: 20px;
   padding: 35px;
@@ -457,7 +459,7 @@ textarea {
 .images-section {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 18px;
+  gap: 10px;
 }
 
 .question-image {
@@ -476,8 +478,16 @@ textarea {
   box-shadow: 0 8px 20px rgba(52, 152, 219, 0.3);
 }
 
+.question-image.highlight {
+  border-color: #3498db;
+  transform: scale(1.05) rotate(1deg);
+  box-shadow: 0 8px 20px rgba(52, 152, 219, 0.3);
+}
+
+
 /* Answer Options */
 .answer-options {
+  /* width: 100%; */
   display: flex;
   flex-direction: column;
   gap: 18px;

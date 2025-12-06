@@ -53,15 +53,21 @@
                                 <!-- Radio buttons for single choice -->
                                 <div ng-if="getCurrentQuestion().type_question_id === 1" class="answer-options">
                                     <div ng-repeat="answer in getCurrentQuestion().Answers_Text track by answer.answer_option_id"
-                                        class="answer-option">
+                                        class="answer-option" ng-mouseenter="setHover(answer.image_answer_id)"
+                                        ng-mouseleave="clearHover()">
+
                                         <input type="radio" id="answer-{{ answer.answer_option_id }}"
                                             name="question-{{ getCurrentQuestion().question_id }}"
                                             ng-value="answer.answer_option_id" ng-model="answers[currentQuestion]"
                                             ng-change="updateAnsweredCount()" ng-disabled="!examData.statusExam">
+
                                         <label for="answer-{{ answer.answer_option_id }}">
                                             <span class="option-letter">{{ getOptionLetter($index) }}</span>
-                                            <span class="option-text">{{ answer.text_answer }}</span>
+                                            <span class="option-text">
+                                                {{ answer.text_answer }}
+                                            </span>
                                         </label>
+
                                     </div>
                                 </div>
 
@@ -90,11 +96,23 @@
                             </div>
 
                             <!-- Images section -->
-                            <div ng-if="getCurrentQuestion().source_image && getCurrentQuestion().source_image.length > 0"
+                            <!-- <div ng-if="getCurrentQuestion().source_image && getCurrentQuestion().source_image.length > 0"
                                 ng-repeat="image in getCurrentQuestion().source_image" class="images-section">
                                 <img ng-src="{{ image.source_image }}" alt="Hình ảnh câu hỏi" class="question-image">
                                 <p>{{image.content}}</p>
+                            </div> -->
+
+                            <div class="images-section"
+                                ng-if="getCurrentQuestion().source_image && getCurrentQuestion().source_image.length > 0">
+                                <div ng-repeat="image in getCurrentQuestion().source_image track by image.image_id">
+                                    <img ng-src="{{ image.source_image }}" class="question-image"
+                                        id="img-question-{{image.image_id}}"
+                                        ng-class="{'highlight': +hoverImageId === image.image_id}">
+
+                                    <p>{{image.content}}</p>
+                                </div>
                             </div>
+
                         </div>
                     </div>
                 </div>
@@ -167,11 +185,11 @@
 <div class="modal" ng-show="showWarningModal">
     <div class="modal-content">
         <div class="modal-header">
-            <h3>⚠️ Cảnh báo</h3>
+            <h3>⚠️ Cảnh báo {{showWarningModal}}</h3>
         </div>
         <div class="modal-body">
             <p>Bạn đã chuyển sang tab khác. Điều này có thể bị coi là gian lận trong bài thi.</p>
-            <p>Số lần chuyển tab: <span>{{ tabSwitchCount }}</span></p>
+            <!-- <p>Số lần chuyển tab: <span>{{ tabSwitchCount }}</span></p> -->
         </div>
         <div class="modal-footer">
             <button class="modal-btn error" ng-click="requestReconnect()">
