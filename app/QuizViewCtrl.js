@@ -20,7 +20,7 @@ app.controller("QuizCtrl", function ($scope, $interval, $window, $timeout, ExamS
     $scope.tabSwitchCount = 0;
     $scope.showWarningModal = localStorage.getItem('showWarningModal') ? localStorage.getItem('showWarningModal') : false;
     $scope.showSubmitConfirmModal = false;
-
+    $scope.isShowWarningModal = false;
 
 
 
@@ -160,6 +160,7 @@ app.controller("QuizCtrl", function ($scope, $interval, $window, $timeout, ExamS
         const data_exam_questions = JSON.parse(localStorage.getItem('data_exam_questions'));
         if (user && data_exam_questions) {
             user.examId = data_exam_questions.examId;
+            $scope.isShowWarningModal=true;
             SocketService.emit("request_reconnect_user", { user });
         }
 
@@ -167,6 +168,7 @@ app.controller("QuizCtrl", function ($scope, $interval, $window, $timeout, ExamS
     SocketService.on("user_reconnect_accepted", function (data) {
         $timeout(function () {
             $scope.showWarningModal = false;
+            $scope.isShowWarningModal=false;
         });
     });
 
@@ -353,7 +355,6 @@ app.controller("QuizCtrl", function ($scope, $interval, $window, $timeout, ExamS
     });
 
     // Initialize anti-cheat system
-    // setupAntiCheat();
     if (!data_local.selectedDocument) {
         setupAntiCheat();
     }
