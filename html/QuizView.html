@@ -185,15 +185,15 @@
 <div class="modal" ng-show="showWarningModal">
     <div class="modal-content">
         <div class="modal-header">
-            <h3>⚠️ Cảnh báo {{showWarningModal}}</h3>
+            <h3>⚠️ Cảnh báo</h3>
         </div>
         <div class="modal-body">
             <p>Bạn đã chuyển sang tab khác. Điều này có thể bị coi là gian lận trong bài thi.</p>
             <!-- <p>Số lần chuyển tab: <span>{{ tabSwitchCount }}</span></p> -->
         </div>
         <div class="modal-footer">
-            <button class="modal-btn error" ng-click="requestReconnect()">
-                Yêu cầu kết nối
+            <button ng-disabled="isShowWarningModal" class="modal-btn error" ng-click="requestReconnect()">
+                {{!isShowWarningModal?'Yêu cầu kết nối':'Đợi phản hồi'}}
             </button>
         </div>
     </div>
