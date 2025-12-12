@@ -84,17 +84,19 @@
     </div>
 
     <!-- Modal thông báo -->
-    <div class="modal" ng-show="vm.modal.show">
+       <div class="modal" ng-show="vm.modal.show">
         <div class="modal-content">
             <div class="modal-header">
                 <h3 ng-bind="vm.modal.title">Thông báo</h3>
             </div>
-            <div class="modal-body">
-                <p ng-bind="vm.modal.message">Nội dung thông báo</p>
+
+            <div class="modal-body center-flex">
+                <p ng-class="vm.modal.type == 'mark' ? 'big-number-3d' : ''" ng-bind="vm.modal.message">
+                </p>
             </div>
             <div class="modal-footer">
                 <button class="modal-btn primary" ng-click="vm.hideModal()">Đồng ý</button>
-                 <!-- <button class="modal-btn error" ng-if="vm.modal.showButton"  ng-click="">Yêu cầu đăng nhập lại!</button> -->
+                <!-- <button class="modal-btn error" ng-if="vm.modal.showButton"  ng-click="">Yêu cầu đăng nhập lại!</button> -->
             </div>
         </div>
     </div>
