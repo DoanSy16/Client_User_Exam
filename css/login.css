@@ -479,7 +479,7 @@ body {
     display: block;
 }
 .modal .big-number-3d {
-font-size:140px;
+font-size:120px;
   font-weight:900;
   text-align:center;
   color:#3b82f6;
@@ -494,3 +494,83 @@ font-size:140px;
   justify-content: center;
   align-items: center;
 }
+
+
+
+/* cào điểm */
+.scratch-wrapper {
+    position: relative;
+    width: 260px;
+    height: 140px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Điểm */
+#markText {
+    position: absolute;
+    z-index: 5;
+    /* font-size: 48px;
+    font-weight: bold;
+    color: #000; */
+}
+
+/* Chữ hướng dẫn */
+.scratch-guide {
+    position: absolute;
+    z-index: 4;
+    font-size: 20px;
+    font-weight: bold;
+    color: rgba(255,255,255,0.85);
+    text-shadow: 0 0 6px rgba(0,0,0,0.6);
+    pointer-events: none;
+    transition: opacity 0.4s ease-out;
+}
+
+/* Canvas lớp bạc */
+#scratchCanvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 260px;
+    height: 140px;
+    z-index: 10;
+    cursor: grab;
+    border-radius: 15px;
+    transition: transform 0.2s ease-out;
+    box-shadow: inset 0 0 8px rgba(255,255,255,0.4),
+                inset 0 0 15px rgba(255,255,255,0.2);
+}
+
+/* Rung nhẹ khi cào */
+.scratch-shake {
+    animation: shake 0.3s ease-in-out;
+}
+
+@keyframes shake {
+    0% { transform: translateX(0px); }
+    25% { transform: translateX(-3px); }
+    50% { transform: translateX(3px); }
+    75% { transform: translateX(-2px); }
+    100% { transform: translateX(0px); }
+}
+
+/* Bụi cào */
+.scratch-dust {
+    position: absolute;
+    width: 5px;
+    height: 5px;
+    background: rgba(230,230,230,0.9);
+    border-radius: 50%;
+    pointer-events: none;
+    animation: fall 0.7s linear forwards;
+}
+
+@keyframes fall {
+    to {
+        transform: translateY(40px) scale(0.2);
+        opacity: 0;
+    }
+}
+
