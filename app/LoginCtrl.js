@@ -19,9 +19,8 @@ app.controller("LoginCtrl", function ($scope, $timeout, $window, SocketService) 
         message: '',
         onClose: null,
         showButton: false,
-        type :'text'
+        type: 'text'
     };
-
     // Danh sách phòng thi hợp lệ
     vm.validRooms = ['A101', 'A102', 'B201', 'B202', 'C301', 'LAB1', 'LAB2'];
 
@@ -41,7 +40,7 @@ app.controller("LoginCtrl", function ($scope, $timeout, $window, SocketService) 
     init();
 
     $scope.$on("SHOW_USER_MARK", function (event, mark) {
-        showModal("Điểm của bạn:", mark, null, true,'mark');
+        showModal("Điểm của bạn:", mark, null, true, 'mark');
     });
 
     function init() {
@@ -64,6 +63,99 @@ app.controller("LoginCtrl", function ($scope, $timeout, $window, SocketService) 
         showModal('⚠️ Lỗi đăng nhập', msg, null, true);
         return
     });
+
+function initScratchCard() {
+    const canvas = document.getElementById("scratchCanvas");
+    const ctx = canvas.getContext("2d");
+
+    const markText = document.getElementById("markText");
+    const wrapper = document.querySelector(".scratch-wrapper");
+
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+
+    /*  LỚP BẠC ÁNH KIM */
+    const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+    gradient.addColorStop(0, "#D9D9D9");
+    gradient.addColorStop(0.3, "#C0C0C0");
+    gradient.addColorStop(0.6, "#ECECEC");
+    gradient.addColorStop(1, "#BFBFBF");
+
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    let isDown = false;
+    let totalCleared = 0;
+
+    canvas.addEventListener("pointerdown", () => {
+        isDown = true;
+
+        /* RUNG NHẸ KHI BẮT ĐẦU CÀO */
+        canvas.classList.add("scratch-shake");
+        setTimeout(() => canvas.classList.remove("scratch-shake"), 300);
+
+        canvas.setPointerCapture(event.pointerId);
+    });
+
+    canvas.addEventListener("pointerup", () => {
+        isDown = false;
+    });
+
+    canvas.addEventListener("pointermove", (event) => {
+        if (!isDown) return;
+
+        const rect = canvas.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+
+        ctx.globalCompositeOperation = "destination-out";
+
+        /* Vùng cào (hình tròn mềm 24px) */
+        const size = 24;
+        ctx.beginPath();
+        ctx.arc(x, y, size, 0, Math.PI * 2);
+        ctx.fill();
+
+        /* BỤI CÀO BAY */
+        createScratchDust(x, y, wrapper);
+
+        checkAutoReveal();
+    });
+
+    /* TỰ ĐỘNG MỞ SAU 60% */
+    function checkAutoReveal() {
+        const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+        let cleared = 0;
+
+        for (let i = 0; i < pixels.length; i += 4) {
+            if (pixels[i + 3] === 0) cleared++;
+        }
+
+        const percent = (cleared / (pixels.length / 4)) * 100;
+
+        if (percent > 60) {
+            revealAll();
+        }
+    }
+
+    function revealAll() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    /* 💨 Tạo bụi cào */
+    function createScratchDust(x, y, container) {
+        const dust = document.createElement("div");
+        dust.className = "scratch-dust";
+        dust.style.left = x + "px";
+        dust.style.top = y + "px";
+
+        container.appendChild(dust);
+
+        setTimeout(() => {
+            dust.remove();
+        }, 700);
+    }
+}
 
 
 
@@ -113,11 +205,11 @@ app.controller("LoginCtrl", function ($scope, $timeout, $window, SocketService) 
 
         // Hiển thị loading
         vm.isLoading = true;
-           localStorage.clear();
+        localStorage.clear();
         // Giả lập quá trình đăng nhập
         simulateLogin()
             .then(function () {
-                
+
                 saveStudentInfo();
                 // Hiển thị thành công và chuyển trang
                 // showModal('✅ Đăng nhập thành công',
@@ -153,7 +245,7 @@ app.controller("LoginCtrl", function ($scope, $timeout, $window, SocketService) 
 
     function saveStudentInfo() {
         try {
- 
+
             var studentInfo = {
                 fullname: vm.formData.fullname.trim(),
                 studentId: vm.formData.studentId.trim(),
@@ -241,15 +333,18 @@ app.controller("LoginCtrl", function ($scope, $timeout, $window, SocketService) 
         }
     }
 
-    function showModal(title, message, onClose, showButton,type) {
+    function showModal(title, message, onClose, showButton, type) {
         vm.modal = {
             show: true,
             title: title,
             message: message,
             onClose: onClose || null,
             showButton: showButton || false,
-            type :type||'text'
+            type: type || 'text'
         };
+        if (vm.modal.type === "mark") {
+            $timeout(initScratchCard, 100);
+        }
     }
 
     function hideModal() {
@@ -260,7 +355,7 @@ app.controller("LoginCtrl", function ($scope, $timeout, $window, SocketService) 
             message: '',
             onClose: null,
             showButton: false,
-            type :'text'
+            type: 'text'
         };
 
         if (onClose && typeof onClose === 'function') {
