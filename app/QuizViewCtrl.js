@@ -346,13 +346,13 @@ app.controller("QuizCtrl", function ($scope, $interval, $window, $timeout, ExamS
     };
 
     // Prevent page refresh/close
-    angular.element($window).on('beforeunload', function (e) {
-        if ($scope.examData.statusExam) {
-            var confirmationMessage = 'Bạn có chắc chắn muốn thoát khỏi bài thi? Dữ liệu có thể bị mất.';
-            e.returnValue = confirmationMessage;
-            return confirmationMessage;
-        }
-    });
+    // angular.element($window).on('beforeunload', function (e) {
+    //     if ($scope.examData.statusExam) {
+    //         var confirmationMessage = 'Bạn có chắc chắn muốn thoát khỏi bài thi? Dữ liệu có thể bị mất.';
+    //         e.returnValue = confirmationMessage;
+    //         return confirmationMessage;
+    //     }
+    // });
 
     // Initialize anti-cheat system
     if (!data_local.selectedDocument) {
