@@ -18,7 +18,8 @@ app.controller("LoginCtrl", function ($scope, $timeout, $window, SocketService) 
         title: '',
         message: '',
         onClose: null,
-        showButton: false
+        showButton: false,
+        type :'text'
     };
 
     // Danh sách phòng thi hợp lệ
@@ -40,14 +41,11 @@ app.controller("LoginCtrl", function ($scope, $timeout, $window, SocketService) 
     init();
 
     $scope.$on("SHOW_USER_MARK", function (event, mark) {
-        showModal("Điểm của bạn:", mark);
+        showModal("Điểm của bạn:", mark, null, true,'mark');
     });
 
     function init() {
-        // Kiểm tra thông tin đã lưu
         loadSavedInfo();
-
-        // Xử lý phím ESC để đóng modal
         angular.element($window).on('keydown', function (e) {
             if (e.key === 'Escape' && vm.modal.show) {
                 vm.hideModal();
@@ -243,13 +241,14 @@ app.controller("LoginCtrl", function ($scope, $timeout, $window, SocketService) 
         }
     }
 
-    function showModal(title, message, onClose, showButton) {
+    function showModal(title, message, onClose, showButton,type) {
         vm.modal = {
             show: true,
             title: title,
             message: message,
             onClose: onClose || null,
-            showButton: showButton || false
+            showButton: showButton || false,
+            type :type||'text'
         };
     }
 
@@ -260,7 +259,8 @@ app.controller("LoginCtrl", function ($scope, $timeout, $window, SocketService) 
             title: '',
             message: '',
             onClose: null,
-            showButton: false
+            showButton: false,
+            type :'text'
         };
 
         if (onClose && typeof onClose === 'function') {
