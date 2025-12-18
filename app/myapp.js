@@ -15,10 +15,10 @@ app.run(function ($rootScope, $window, $timeout, ExamService, SocketService, Cry
 
 
   $rootScope.$on('$routeChangeSuccess', function () {
-    let mark = localStorage.getItem("user_mark");
-    if (mark) {
+    let data_user = localStorage.getItem("user_mark");
+    if (data_user) {
       $timeout(() => {
-        $rootScope.$broadcast("SHOW_USER_MARK", mark);
+        $rootScope.$broadcast("SHOW_USER_MARK", data_user);
       }, 0);
       localStorage.removeItem("user_mark");
     }
