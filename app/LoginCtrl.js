@@ -39,8 +39,9 @@ app.controller("LoginCtrl", function ($scope, $timeout, $window, SocketService) 
     // Khởi tạo
     init();
 
-    $scope.$on("SHOW_USER_MARK", function (event, mark) {
-        showModal("Điểm của bạn:", mark, null, true, 'mark');
+  $scope.$on("SHOW_USER_MARK", function (event, data_user) {
+        let js =JSON.parse(data_user);
+        showModal(`${js.fullname} - ${js.user_code} - ${js.class}:`, js.mark, null, true, 'mark');
     });
 
     function init() {
