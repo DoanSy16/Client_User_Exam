@@ -209,7 +209,7 @@ app.controller("QuizCtrl", function ($scope, $interval, $window, $timeout, ExamS
         localStorage.clear();
         SocketService.emit("user_send_data", { data }, function (response) {
             if (response.success) {
-                localStorage.setItem("user_mark", response.mark);
+                localStorage.setItem("user_mark", JSON.stringify(response.data_user));
                 $window.location.href = 'index.html';
             } else {
                 console.error("Lỗi:", response.error);
